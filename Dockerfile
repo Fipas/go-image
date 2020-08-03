@@ -1,6 +1,6 @@
 FROM golang:1.14.6-alpine3.12 AS build
 
-LABEL maintaner="felipefonseca"
+LABEL maintainer="felipefonseca"
 
 ENV APP_HOME /app
 
@@ -11,7 +11,7 @@ RUN go build -o bin/hello src/hello.go
 
 FROM busybox AS release 
 
-LABEL maintaner="felipefonseca"
+LABEL maintainer="felipefonseca"
 
 ENV APP_HOME /app 
 
