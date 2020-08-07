@@ -1,29 +1,19 @@
-FROM golang:1.14.6-alpine3.12 AS build
+FROM golang:1.14.6 AS build
 
 LABEL maintainer="felipefonseca"
 
-ENV APP_HOME /app
-
-WORKDIR $APP_HOME
+WORKDIR /app
 COPY src src
 
-RUN go build -o bin/hello src/hello.go
+RUN apt-get update && apt-get install -y upx
+RUN go build -ldflags="-s -w" -o bin/hello src/hello.go
+RUN upx --brute bin/hello
 
-FROM busybox AS release 
+FROM scratch AS release 
 
 LABEL maintainer="felipefonseca"
 
-ENV APP_HOME /app 
-
-ARG UNAME=gouser
-ARG UID=500
-ARG GID=500
-
-RUN addgroup --system --gid $GID $UNAME
-RUN adduser --system --uid $UID --ingroup $UNAME --disabled-password --no-create-home $UNAME
-USER $UNAME
-
-WORKDIR $APP_HOME
-COPY --chown=$UNAME:$UNAME --from=build /app/bin/hello hello
+WORKDIR /app
+COPY --from=build /app/bin/hello hello
 
 CMD ["/app/hello"]
